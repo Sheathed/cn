@@ -1,8 +1,8 @@
-
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 /// A Widget that holds a custom navigator with all the basics functionality.
 /// A common use for such widget is when you need to implement an "Always presenting bottom navigation bar"
@@ -56,7 +56,7 @@ class CustomNavigator extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _CustomNavigatorState createState() => _CustomNavigatorState();
+  createState() => _CustomNavigatorState();
 }
 
 class _CustomNavigatorState extends State<CustomNavigator>
@@ -77,14 +77,13 @@ class _CustomNavigatorState extends State<CustomNavigator>
   Widget build(BuildContext context) {
     return Navigator(
       key: _navigator,
-      // If window.defaultRouteName isn't '/', we should assume it was set
+      // If PlatformDispatcher.instance.defaultRouteName isn't '/', we should assume it was set
       // intentionally via `setInitialRoute`, and should override whatever
       // is in [widget.initialRoute].
-      initialRoute: WidgetsBinding.instance.window.defaultRouteName !=
-          Navigator.defaultRouteName
-          ? WidgetsBinding.instance.window.defaultRouteName
-          : widget.initialRoute ??
-          WidgetsBinding.instance.window.defaultRouteName,
+      initialRoute: PlatformDispatcher.instance.defaultRouteName !=
+              Navigator.defaultRouteName
+          ? PlatformDispatcher.instance.defaultRouteName
+          : widget.initialRoute ?? PlatformDispatcher.instance.defaultRouteName,
       onGenerateRoute: _onGenerateRoute,
       onUnknownRoute: _onUnknownRoute,
       observers: widget.navigatorObservers,
@@ -111,10 +110,10 @@ class _CustomNavigatorState extends State<CustomNavigator>
 
   @override
   void didHaveMemoryPressure() {}
-  
+
   @override
   Future<bool> didPushRouteInformation(RouteInformation routeInformation) {
-    return didPushRoute(routeInformation.location ?? '/');
+    return didPushRoute(routeInformation.uri.toString());
   }
 
   // A system method that get invoked when user press back button on Android or back slide on iOS
@@ -138,24 +137,24 @@ class _CustomNavigatorState extends State<CustomNavigator>
   Route<dynamic>? _onGenerateRoute(RouteSettings settings) {
     final String? name = settings.name;
     final Widget Function(BuildContext context)? pageContentBuilder =
-    name == Navigator.defaultRouteName && widget.home != null
-        ? (BuildContext context) => widget.home!
-        : widget.routes[name];
+        name == Navigator.defaultRouteName && widget.home != null
+            ? (BuildContext context) => widget.home!
+            : widget.routes[name];
 
     if (pageContentBuilder != null) {
       assert(
-      widget.pageRoute != null,
-      'The default onGenerateRoute handler for CustomNavigator must have a '
+          widget.pageRoute != null,
+          'The default onGenerateRoute handler for CustomNavigator must have a '
           'pageRoute set if the home or routes properties are set.');
       final Route<dynamic> route = widget.pageRoute!<dynamic>(
         settings,
         pageContentBuilder,
       );
-      assert(route != null,
-      'The pageRouteBuilder for CustomNavigator must return a valid non-null Route.');
       return route;
     }
-    if (widget.onGenerateRoute != null) return widget.onGenerateRoute!(settings);
+    if (widget.onGenerateRoute != null) {
+      return widget.onGenerateRoute!(settings);
+    }
     return null;
   }
 
@@ -164,14 +163,14 @@ class _CustomNavigatorState extends State<CustomNavigator>
       if (widget.onUnknownRoute == null) {
         throw FlutterError(
             'Could not find a generator for route $settings in the $runtimeType.\n'
-                'Generators for routes are searched for in the following order:\n'
-                ' 1. For the "/" route, the "home" property, if non-null, is used.\n'
-                ' 2. Otherwise, the "routes" table is used, if it has an entry for '
-                'the route.\n'
-                ' 3. Otherwise, onGenerateRoute is called. It should return a '
-                'non-null value for any valid route not handled by "home" and "routes".\n'
-                ' 4. Finally if all else fails onUnknownRoute is called.\n'
-                'Unfortunately, onUnknownRoute was not set.');
+            'Generators for routes are searched for in the following order:\n'
+            ' 1. For the "/" route, the "home" property, if non-null, is used.\n'
+            ' 2. Otherwise, the "routes" table is used, if it has an entry for '
+            'the route.\n'
+            ' 3. Otherwise, onGenerateRoute is called. It should return a '
+            'non-null value for any valid route not handled by "home" and "routes".\n'
+            ' 4. Finally if all else fails onUnknownRoute is called.\n'
+            'Unfortunately, onUnknownRoute was not set.');
       }
       return true;
     }());
@@ -192,13 +191,34 @@ class _CustomNavigatorState extends State<CustomNavigator>
   Future<AppExitResponse> didRequestAppExit() async {
     return AppExitResponse.exit;
   }
+
+  @override
+  void handleCancelBackGesture() {
+    // No-ops. Out of scope
+  }
+
+  @override
+  void handleCommitBackGesture() {
+    // No-ops. Out of scope
+  }
+
+  @override
+  bool handleStartBackGesture(PredictiveBackEvent backEvent) {
+    throw UnimplementedError();
+  }
+
+  @override
+  void handleUpdateBackGestureProgress(PredictiveBackEvent backEvent) {
+    // No-ops. Out of scope
+  }
 }
 
 class PageRoutes {
-  static final materialPageRoute =
-  <T>(RouteSettings settings, WidgetBuilder builder) =>
+  static MaterialPageRoute<T> materialPageRoute<T>(
+          RouteSettings settings, WidgetBuilder builder) =>
       MaterialPageRoute<T>(settings: settings, builder: builder);
-  static final cupertinoPageRoute =
-  <T>(RouteSettings settings, WidgetBuilder builder) =>
+
+  static CupertinoPageRoute<T> cupertinoPageRoute<T>(
+          RouteSettings settings, WidgetBuilder builder) =>
       CupertinoPageRoute<T>(settings: settings, builder: builder);
 }
