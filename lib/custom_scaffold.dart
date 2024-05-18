@@ -45,7 +45,7 @@ class CustomScaffold extends StatefulWidget {
 
 class _CustomScaffoldState extends State<CustomScaffold> {
   int _index = 0;
-  GlobalKey<NavigatorState> _key = GlobalKey<NavigatorState>();
+  final GlobalKey<NavigatorState> _key = GlobalKey<NavigatorState>();
 
   @override
   void initState() {
@@ -66,7 +66,8 @@ class _CustomScaffoldState extends State<CustomScaffold> {
         pageRoute: PageRoutes.materialPageRoute,
       ),
       drawer: widget.scaffold?.drawer,
-      drawerDragStartBehavior: widget.scaffold?.drawerDragStartBehavior ?? DragStartBehavior.start,
+      drawerDragStartBehavior:
+          widget.scaffold?.drawerDragStartBehavior ?? DragStartBehavior.start,
       drawerScrimColor: widget.scaffold?.drawerScrimColor,
       endDrawer: widget.scaffold?.endDrawer,
       extendBody: widget.scaffold?.extendBody ?? false,
@@ -85,7 +86,8 @@ class _CustomScaffoldState extends State<CustomScaffold> {
     assert(widget.scaffold?.bottomNavigationBar != null);
     assert(widget.scaffold?.bottomNavigationBar is BottomNavigationBar);
 
-    BottomNavigationBar b = widget.scaffold?.bottomNavigationBar as BottomNavigationBar;
+    BottomNavigationBar b =
+        widget.scaffold?.bottomNavigationBar as BottomNavigationBar;
     return BottomNavigationBar(
       key: b.key,
       items: b.items,
