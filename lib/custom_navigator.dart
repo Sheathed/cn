@@ -211,6 +211,11 @@ class _CustomNavigatorState extends State<CustomNavigator>
   void handleUpdateBackGestureProgress(PredictiveBackEvent backEvent) {
     // No-ops. Out of scope
   }
+
+  @override
+  void didChangeViewFocus(ViewFocusEvent event) {
+    // No-ops. Out of scope
+  }
 }
 
 class PageRoutes {
