@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:custom_navigator/custom_navigator.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 //give a navigator key to [MaterialApp] if you want to use the default navigation
 //anywhere in your app eg: line 15 & line 93
 GlobalKey<NavigatorState> mainNavigatorKey = GlobalKey<NavigatorState>();
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -15,24 +17,25 @@ class MyApp extends StatelessWidget {
       navigatorKey: mainNavigatorKey,
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        useMaterial3: true,
+        primarySwatch: Colors.pink,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  const MyHomePage({Key? key, this.title}) : super(key: key);
 
-  final String title;
+  final String? title;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  Page _page = Page('Page 0');
+  Page _page = const Page('Page 0');
   int _currentIndex = 0;
 
   // Custom navigator takes a global key if you want to access the
@@ -47,7 +50,7 @@ class _MyHomePageState extends State<MyHomePage> {
         onTap: (index) {
           // here we used the navigator key to pop the stack to get back to our
           // main page
-          navigatorKey.currentState.maybePop();
+          navigatorKey.currentState?.maybePop();
           setState(() => _page = Page('Page $index'));
           _currentIndex = index;
         },
@@ -63,27 +66,27 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   final _items = [
-    BottomNavigationBarItem(icon: Icon(Icons.home), title: Text('home')),
-    BottomNavigationBarItem(icon: Icon(Icons.event), title: Text('events')),
-    BottomNavigationBarItem(
-        icon: Icon(Icons.save_alt), title: Text('downloads')),
+    const BottomNavigationBarItem(icon: Icon(Icons.home), label: 'home'),
+    const BottomNavigationBarItem(icon: Icon(Icons.event), label: 'events'),
+    const BottomNavigationBarItem(
+        icon: Icon(Icons.save_alt), label: 'downloads'),
   ];
 }
 
 class Page extends StatelessWidget {
-  final String title;
+  final String? title;
 
-  const Page(this.title) : assert(title != null);
+  const Page(this.title, {Key? key})
+      : assert(title != null),
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final text = Text(title);
+    final text = Text(title ?? '');
 
-    return Container(
-      child: Center(
-          child: FlatButton(
-              onPressed: () => _openDetailsPage(context), child: text)),
-    );
+    return Center(
+        child: ElevatedButton(
+            onPressed: () => _openDetailsPage(context), child: text));
   }
 
   //Use the navigator like you usually do with .of(context) method
@@ -91,19 +94,18 @@ class Page extends StatelessWidget {
       .push(MaterialPageRoute(builder: (context) => DetailsPage(title)));
 
 //  _openDetailsPage(BuildContext context) => mainNavigatorKey.currentState.push(MaterialPageRoute(builder: (context) => DetailsPage(title)));
-
 }
 
 class DetailsPage extends StatelessWidget {
-  final String title;
+  final String? title;
 
-  const DetailsPage(this.title) : assert(title != null);
+  const DetailsPage(this.title, {Key? key})
+      : assert(title != null),
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final text = Text('Details of $title');
-    return Container(
-      child: Center(child: text),
-    );
+    return Center(child: text);
   }
 }

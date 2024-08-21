@@ -1,13 +1,15 @@
 import 'package:custom_navigator/custom_scaffold.dart';
 import 'package:flutter/material.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 //give a navigator key to [MaterialApp] if you want to use the default navigation
 //anywhere in your app eg: line 15 & line 93
 GlobalKey<NavigatorState> mainNavigatorKey = GlobalKey<NavigatorState>();
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -15,20 +17,24 @@ class MyApp extends StatelessWidget {
       navigatorKey: mainNavigatorKey,
       title: 'Flutter Demo',
       theme: ThemeData(
+        useMaterial3: true,
         primarySwatch: Colors.pink,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.pink,
+        ),
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, this.title}) : super(key: key);
+  const MyHomePage({Key? key, this.title}) : super(key: key);
 
   final String? title;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
@@ -51,7 +57,7 @@ class _MyHomePageState extends State<MyHomePage> {
       // Children are the pages that will be shown by every click
       // They should placed in order such as
       // `page 0` will be presented when `item 0` in the [BottomNavigationBar] clicked.
-      children: <Widget>[
+      children: const <Widget>[
         Page('0'),
         Page('1'),
         Page('2'),
@@ -63,29 +69,30 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   final _items = [
-    BottomNavigationBarItem(icon: Icon(Icons.home), title: Text('home')),
-    BottomNavigationBarItem(icon: Icon(Icons.event), title: Text('events')),
-    BottomNavigationBarItem(
-        icon: Icon(Icons.save_alt), title: Text('downloads')),
+    const BottomNavigationBarItem(icon: Icon(Icons.home), label: 'home'),
+    const BottomNavigationBarItem(icon: Icon(Icons.event), label: 'events'),
+    const BottomNavigationBarItem(
+        icon: Icon(Icons.save_alt), label: 'downloads'),
   ];
 }
 
 class Page extends StatelessWidget {
-  final String title;
+  final String? title;
 
-  const Page(this.title) : assert(title != null);
+  const Page(this.title, {Key? key})
+      : assert(title != null),
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final text = Text(title);
+    final text = Text(title ?? '');
 
     return Scaffold(
-      body: Container(
-        child: Center(
-            child: FlatButton(
-                onPressed: () => _openDetailsPage(context), child: text)),
-      ),
+      body: Center(
+          child: ElevatedButton(
+              onPressed: () => _openDetailsPage(context), child: text)),
       appBar: AppBar(
+        centerTitle: true,
         title: text,
       ),
     );
@@ -96,22 +103,24 @@ class Page extends StatelessWidget {
       .push(MaterialPageRoute(builder: (context) => DetailsPage(title)));
 
 //  _openDetailsPage(BuildContext context) => mainNavigatorKey.currentState.push(MaterialPageRoute(builder: (context) => DetailsPage(title)));
-
 }
 
 class DetailsPage extends StatelessWidget {
-  final String title;
+  final String? title;
 
-  const DetailsPage(this.title) : assert(title != null);
+  const DetailsPage(this.title, {Key? key})
+      : assert(title != null),
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final text = Text('Details of $title');
     return Scaffold(
-      body: Container(
-        child: Center(child: text),
+      body: Center(child: text),
+      appBar: AppBar(
+        centerTitle: true,
+        title: text,
       ),
-      appBar: AppBar(title: text),
     );
   }
 }
