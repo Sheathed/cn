@@ -73,6 +73,11 @@ class _CustomNavigatorState extends State<CustomNavigator>
     super.initState();
   }
 
+  
+  @override
+  void didChangeViewFocus(ViewFocusEvent event) {
+  }
+
   @override
   Widget build(BuildContext context) {
     return Navigator(
@@ -209,11 +214,6 @@ class _CustomNavigatorState extends State<CustomNavigator>
 
   @override
   void handleUpdateBackGestureProgress(PredictiveBackEvent backEvent) {
-    // No-ops. Out of scope
-  }
-
-  @override
-  void didChangeViewFocus(ViewFocusEvent event) {
     // No-ops. Out of scope
   }
 }
